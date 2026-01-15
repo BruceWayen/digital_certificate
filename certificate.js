@@ -1,58 +1,11 @@
-// 配置项：可以通过修改这些变量来更换logo和印章
-const config = {
-    logoPath: 'pic/logo.png',  // 公司logo路径
-    sealPath: 'pic/seal.png'   // 公司印章路径
-};
-
-// 中文数字映射
-const chineseNumbers = {
-    '零': 0, '一': 1, '壹': 1, '二': 2, '贰': 2, '三': 3, '叁': 3,
-    '四': 4, '肆': 4, '五': 5, '伍': 5, '六': 6, '陆': 6,
-    '七': 7, '柒': 7, '八': 8, '捌': 8, '九': 9, '玖': 9
-};
-
-const chineseUnits = {
-    '十': 10, '拾': 10, '百': 100, '佰': 100,
-    '千': 1000, '仟': 1000, '万': 10000, '亿': 100000000
-};
+// 从工具类获取中文数字和单位映射
+const chineseNumbers = Utils.chineseNumbers;
+const chineseUnits = Utils.chineseUnits;
 
 // 权证编号计数器
 let warrantCounter = 1;
-
-// 初始化图片
-async function initImages() {
-    const logoImg = document.getElementById('companyLogo');
-    const sealImg = document.getElementById('companySeal');
-
-    // 使用 fetch 加载本地图片并转换为 Data URL
-    const loadLocalImage = async (path) => {
-        try {
-            const response = await fetch(path);
-            if (!response.ok) {
-                throw new Error(`Failed to load image: ${path}`);
-            }
-            const blob = await response.blob();
-            return URL.createObjectURL(blob);
-        } catch (error) {
-            console.error('Error loading image:', error);
-            return null;
-        }
-    };
-
-    // 加载 logo 和 seal
-    const logoUrl = await loadLocalImage(config.logoPath);
-    const sealUrl = await loadLocalImage(config.sealPath);
-
-    if (logoUrl) {
-        logoImg.src = logoUrl;
-    }
-    if (sealUrl) {
-        sealImg.src = sealUrl;
-    }
-}
 // 页面加载完成后初始化
 window.addEventListener('load', async () => {
-    //  await initImages();
     initCheckboxBehavior();
     initImportButton();
 
@@ -557,30 +510,6 @@ function getTwoYearsLater(dateStr) {
     return `${year}年${month}月${day}日`;
 }
 
-// 计算HASH值
-async function calculateHash(data) {
-    const text = [
-        data.buyer || '',
-        data.buyerCode || '',
-        data.seller || '',
-        data.sellerCode || '',
-        String(data.amount || ''),
-        data.accountName || '',
-        data.bankNumber || '',
-        data.accountNumber || '',
-        data.bankName || '',
-        data.paymentDate || '',
-        data.validDate || ''
-    ].join('|');
-
-    const encoder = new TextEncoder();
-    const dataBuffer = encoder.encode(text);
-    const hashBuffer = await crypto.subtle.digest('SHA-256', dataBuffer);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-    // 返回前32位十六进制字符（128位哈希值）
-    return hashHex.substring(0, 32);
-}
 
 // 填充数据到页面
 async function fillData(rowData) {
@@ -759,41 +688,10 @@ async function captureScreenshot(buyerName, amount) {
 
         // 获取证书容器
         const container = document.querySelector('.certificate-container');
+        replaceInputsForSnapshot(container);
 
         // 等待样式生效
         await new Promise(resolve => setTimeout(resolve, 500));
-
-        // 强制重置可能影响布局的 CSS，只针对可能影响截图的特定元素
-        const style = document.createElement('style');
-        style.textContent = `
-            .section-part1 .cell {
-                overflow: visible !important;
-                word-break: break-word !important;
-                min-height: auto !important;
-            }
-            .part2-content .cell {
-                overflow: visible !important;
-                word-break: break-word !important;
-                min-height: auto !important;
-            }
-            .editable {
-                overflow: visible !important;
-                text-overflow: clip !important;
-                max-height: none !important;
-                line-height: normal !important;
-            }
-            input, textarea {
-                overflow: visible !important;
-                white-space: normal !important;
-                word-wrap: break-word !important;
-                line-height: normal !important;
-            }
-            .section-part1 .cell, .part2-content .cell {
-                position: static !important;
-                float: none !important;
-            }
-        `;
-        document.head.appendChild(style);
 
         // 等待样式应用
         await new Promise(resolve => setTimeout(resolve, 100));
@@ -832,7 +730,7 @@ async function captureScreenshot(buyerName, amount) {
             container.offsetHeight,
             container.clientHeight
         );
-        
+
         // 额外增加一些缓冲空间以确保所有内容都被捕获
         actualHeight = Math.floor(actualHeight * 1.1); // 增加10%的缓冲
 
@@ -857,12 +755,7 @@ async function captureScreenshot(buyerName, amount) {
         });
 
         // 在截图完成后移除临时样式
-        setTimeout(() => {
-            if (document.head.contains(style)) {
-                document.head.removeChild(style);
-            }
-        }, 100);
-
+        restoreInputsAfterSnapshot(container)
         // 方案5：兜底方案（先转 dataURL 再转 Blob，避免直接 toBlob 报错）
         function canvasToBlob(canvas, mimeType = 'image/png', quality = 0.9) {
             return new Promise((resolve) => {
@@ -973,7 +866,59 @@ async function readExcelFile(file) {
     });
 }
 
+// ===== 截图前：input → span =====
+function replaceInputsForSnapshot(container) {
+    //const inputs = container.querySelectorAll('input');
+    const inputs = container.querySelectorAll('input[type="text"], input:not([type]), textarea');
+    inputs.forEach(input => {
+        const span = document.createElement('span');
+        span.textContent = input.value || '';
+
+        const style = window.getComputedStyle(input);
+
+        // 关键：完整复制视觉属性
+        span.style.fontFamily = style.fontFamily;
+        span.style.fontSize = style.fontSize;
+        span.style.fontWeight = style.fontWeight;
+        span.style.color = style.color;
+        span.style.textAlign = style.textAlign;
+
+        span.style.width = style.width;
+        span.style.height = style.height;
+        span.style.padding = style.padding;
+        span.style.border = style.border;
+        span.style.boxSizing = 'border-box';
+
+        // 关键中的关键：避免 baseline 裁切
+        span.style.display = 'inline-flex';
+        span.style.alignItems = 'center';
+        span.style.justifyContent =
+            style.textAlign === 'center' ? 'center' : 'flex-start';
+        span.style.lineHeight = style.height;
+
+        span.style.whiteSpace = 'pre-wrap';
+        span.style.background = 'transparent';
+
+        span.dataset.snapshotReplace = 'true';
+
+        input.style.display = 'none';
+        input.parentNode.insertBefore(span, input);
+    });
+}
+
+// ===== 截图后：恢复 input =====
+function restoreInputsAfterSnapshot(container) {
+    const spans = container.querySelectorAll('span[data-snapshot-replace]');
+    spans.forEach(span => {
+        const input = span.nextSibling;
+        if (input && input.tagName === 'INPUT') {
+            input.style.display = '';
+        }
+        span.remove();
+    });
+}
+
 // 截图功能
 document.getElementById('screenshotBtn').addEventListener('click', function () {
-    captureScreenshot('数字确真凭证', '1000000');
+    captureScreenshot('数字确真凭证', '');
 });
