@@ -1,0 +1,480 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: "Microsoft YaHei", "SimSun", Arial, sans-serif;
+    background-color: #f5f5f5;
+    padding: 20px;
+}
+
+/* 固定内容样式：标签、表头等 */
+.fixed-text {
+    font-family: "Microsoft YaHei", "SimHei", sans-serif;
+    font-weight: 500;
+    color: #333;
+}
+
+/* 可编辑内容样式：输入框、表格数值等 */
+.editable-text {
+    font-family: "SimSun", "Arial", monospace;
+    font-weight: normal;
+    color: #000;
+}
+
+/* 导入按钮容器 */
+.import-controls {
+    max-width: 1200px;
+    margin: 0 auto 20px auto;
+    padding: 15px 20px;
+    background-color: white;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 4px;
+}
+
+.import-hint {
+    margin-left: 15px;
+    color: #666;
+    font-size: 13px;
+}
+
+.import-button {
+    background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
+    color: white;
+    border: none;
+    padding: 10px 25px;
+    font-size: 14px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: "Microsoft YaHei", sans-serif;
+    transition: opacity 0.3s;
+}
+
+.import-button:hover {
+    opacity: 0.9;
+}
+
+.import-button:active {
+    opacity: 0.8;
+}
+
+#fileInput {
+    display: none;
+}
+
+.certificate-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    background-color: white;
+    padding: 30px 40px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    position: relative;
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #d0d0d0;
+    padding-bottom: 20px;
+}
+
+.logo-title {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 30px;
+    margin-bottom: 20px;
+}
+
+.logo {
+    width: 70px;
+    height: 70px;
+    object-fit: contain;
+}
+
+.company-name {
+    font-size: 20px;
+    color: #333;
+    text-align: center;
+}
+
+.company-name-en {
+    font-size: 14px;
+    color: #666;
+}
+
+.certificate-title {
+    font-size: 28px;
+    font-weight: bold;
+    color: #333;
+    letter-spacing: 10px;
+}
+
+.info-banner {
+    background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
+    color: white;
+    padding: 12px 20px;
+    margin-bottom: 2px;
+    border-radius: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+    font-family: "Microsoft YaHei", "SimHei", sans-serif;
+    font-weight: 500;
+}
+
+.info-banner-left {
+    display: flex;
+    gap: 30px;
+    font-size: 14px;
+}
+
+.info-banner-right {
+    font-size: 14px;
+}
+
+.content-section {
+    border: 1px solid #d0d0d0;
+    margin-bottom: 0;
+    width: 100%;
+}
+
+/* 添加截图按钮样式 */
+.screenshot-btn {
+    background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 14px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: "Microsoft YaHei", sans-serif;
+    transition: opacity 0.3s;
+    margin-left: 15px;
+}
+
+.screenshot-btn:hover {
+    opacity: 0.9;
+}
+
+.screenshot-btn:active {
+    opacity: 0.8;
+}
+
+/* 第一部分：2行5列 */
+.section-part1 {
+    display: grid;
+    grid-template-columns: 80px 100px 1fr 150px 1fr;
+    border-bottom: 1px solid #d0d0d0;
+}
+
+.section-part1 .cell {
+    border-right: 1px solid #d0d0d0;
+    border-bottom: 1px solid #d0d0d0;
+    padding: 10px 15px;
+    min-height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    overflow: hidden;
+    /* 防止内容溢出 */
+    word-break: break-all;
+    /* 允许在单词内换行 */
+    vertical-align: middle;
+    /* 垂直居中 */
+}
+
+.section-part1 .cell:nth-child(5n) {
+    border-right: none;
+}
+
+.section-part1 .cell:nth-last-child(-n+5) {
+    border-bottom: none;
+}
+
+.cell.label {
+    background-color: #f8f8f8;
+    font-weight: normal;
+    color: #333;
+    white-space: nowrap;
+    font-family: "Microsoft YaHei", "SimHei", sans-serif;
+}
+
+/* 第二部分：左侧合并列 + 6行4列 */
+.section-part2 {
+    display: grid;
+    grid-template-columns: 120px 1fr;
+    border-bottom: 1px solid #d0d0d0;
+}
+
+.merged-label {
+    background-color: #f8f8f8;
+    border-right: 1px solid #d0d0d0;
+    padding: 15px 10px;
+    writing-mode: horizontal-tb;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    letter-spacing: 2px;
+    color: #333;
+    white-space: nowrap;
+    font-family: "Microsoft YaHei", "SimHei", sans-serif;
+    font-weight: 500;
+}
+
+.part2-content {
+    display: grid;
+    grid-template-columns: 100px 1fr 110px 1fr;
+}
+
+.part2-content .cell {
+    border-right: 1px solid #d0d0d0;
+    border-bottom: 1px solid #d0d0d0;
+    padding: 10px 15px;
+    min-height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    overflow: hidden;
+    /* 防止内容溢出 */
+    word-break: break-all;
+    /* 允许在单词内换行 */
+    vertical-align: middle;
+    /* 垂直居中 */
+}
+
+.part2-content .cell:nth-child(4n) {
+    border-right: none;
+}
+
+.part2-content .cell:nth-last-child(-n+4) {
+    border-bottom: none;
+}
+
+.cell.span-3 {
+    grid-column: span 3;
+}
+
+.cell.span-2 {
+    grid-column: span 2;
+}
+
+.editable {
+    min-width: 50px;
+    display: inline-block;
+    border: none;
+    background: transparent;
+    outline: none;
+    width: 100%;
+    padding: 2px 5px;
+    text-align: center;
+    font-family: "SimSun", "Arial", monospace;
+    font-weight: normal;
+    color: #000;
+    max-width: 100%;
+    /* 防止撑开单元格 */
+    overflow: hidden;
+    /* 输入框内部溢出隐藏 */
+    text-overflow: ellipsis;
+    /* 超出显示省略号 */
+    white-space: normal;
+    /* 允许换行 */
+}
+
+.editable:focus {
+    background-color: #fffacd;
+    border: 1px solid #4a90e2;
+    border-radius: 2px;
+}
+
+.full-width-row {
+    grid-column: 1 / -1;
+}
+
+.amount-container {
+    display: inline-block;
+}
+
+.amount-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 30px;
+    width: 100%;
+}
+
+.amount-left {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+    /* 关键：允许 flex item 缩小到内容以下 */
+}
+
+.amount-label {
+    white-space: nowrap;
+}
+
+.amount-left .editable {
+    flex: 1;
+    min-width: 150px;
+}
+
+.amount-right {
+    flex-shrink: 0;
+    padding-left: 20px;
+    border-left: 1px solid #e0e0e0;
+}
+
+.amount-table {
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+.amount-table tr {
+    height: 28px;
+    /* 固定行高 */
+}
+
+.amount-table td {
+    width: 26px;
+    height: 100%;
+    /* 填满行高 */
+    text-align: center;
+    border: 1px solid #999;
+    padding: 0;
+    vertical-align: middle;
+    /* 垂直居中 */
+}
+
+.amount-table .header-row td {
+    background-color: #f5f5f5;
+    color: #666;
+    font-size: 12px;
+    border: 1px solid #ddd;
+    font-family: "Microsoft YaHei", "SimHei", sans-serif;
+    font-weight: 500;
+}
+
+.amount-table .value-row td {
+    background-color: white;
+    font-size: 15px;
+    color: #000;
+    font-family: "SimSun", "Arial", monospace;
+    font-weight: normal;
+}
+
+.amount-table .currency-cell {
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.checkbox-group {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.checkbox-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    cursor: pointer;
+    transition: opacity 0.3s;
+}
+
+.checkbox-item.disabled {
+    opacity: 0.4;
+    cursor: default;
+}
+
+.checkbox-item input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+    accent-color: #4a90e2;
+}
+
+.checkbox-item.disabled input[type="checkbox"] {
+    cursor: default;
+}
+
+.checkbox-label {
+    font-size: 14px;
+    user-select: none;
+    font-family: "SimSun", "Arial", monospace;
+    font-weight: normal;
+    color: #000;
+}
+
+.notes-section {
+    margin-top: 2px;
+    padding: 20px;
+    background-color: #fafafa;
+    border: 1px solid #d0d0d0;
+    border-top: 2px solid #4a90e2;
+    position: relative;
+}
+
+.notes-title {
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 15px;
+    font-size: 14px;
+    font-family: "Microsoft YaHei", "SimHei", sans-serif;
+}
+
+.note-item {
+    color: #666;
+    font-size: 13px;
+    line-height: 1.8;
+    margin-bottom: 8px;
+    font-family: "Microsoft YaHei", sans-serif;
+}
+
+.company-info {
+    position: absolute;
+    bottom: 60px;
+    right: 100px;
+    text-align: center;
+}
+
+.seal {
+    width: 110px;
+    height: 110px;
+    object-fit: contain;
+    opacity: 0.85;
+}
+
+.section-divider {
+    border-left: 1px solid #d0d0d0;
+    height: 100%;
+}
+
+.highlight-red {
+    color: #e74c3c;
+}
+
+@media print {
+    body {
+        background-color: white;
+        padding: 0;
+    }
+
+    .certificate-container {
+        box-shadow: none;
+        padding: 20px;
+    }
+
+    .import-controls {
+        display: none;
+    }
+}
