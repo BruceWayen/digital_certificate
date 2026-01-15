@@ -578,7 +578,8 @@ async function calculateHash(data) {
     const hashBuffer = await crypto.subtle.digest('SHA-256', dataBuffer);
     const hashArray = Array.from(new Uint8Array(hashBuffer));
     const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-    return hashHex;
+    // 返回前32位十六进制字符（128位哈希值）
+    return hashHex.substring(0, 32);
 }
 
 // 填充数据到页面
