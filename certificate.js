@@ -1011,6 +1011,7 @@ class DigitalCertificateApp {
       validDate: validDate
     };
     const hash = await Utils.calculateHash(hashData);
+    console.log("计算得到的HASH:", hash);
     filteredPart2Inputs[5].value = hash;
     // 设置HASH输入框为只读且不可修改
     filteredPart2Inputs[5].readOnly = true;
