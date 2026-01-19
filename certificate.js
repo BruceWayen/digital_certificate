@@ -376,7 +376,16 @@ class Utils {
         if (typeof CryptoJS !== 'undefined' && CryptoJS.SHA256) {
             try {
                 const hashObj = CryptoJS.SHA256(text);
-                const hashHex = hashObj.toString(CryptoJS.enc.Hex);
+                // 对于我们实现的本地crypto-js库，直接调用toString()即可获得十六进制字符串
+                let hashHex;
+                if (typeof hashObj.toString === 'function') {
+                    hashHex = hashObj.toString();
+                } else {
+                    // 如果没有toString方法，则转换字节数组为十六进制字符串
+                    hashHex = hashObj.words.map(byte => {
+                        return ('00' + (byte & 0xFF).toString(16)).slice(-2);
+                    }).join('');
+                }
                 // 返回前32位十六进制字符（128位哈希值）
                 return hashHex.substring(0, 32);
             } catch (error) {
