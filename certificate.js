@@ -357,13 +357,35 @@ class Utils {
             data.validDate || ''
         ].join('|');
 
-        const encoder = new TextEncoder();
-        const dataBuffer = encoder.encode(text);
-        const hashBuffer = await crypto.subtle.digest('SHA-256', dataBuffer);
-        const hashArray = Array.from(new Uint8Array(hashBuffer));
-        const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-        // 返回前32位十六进制字符（128位哈希值）
-        return hashHex.substring(0, 32);
+        // 检查crypto.subtle是否可用（仅在安全上下文如HTTPS或localhost中可用）
+        if (crypto && crypto.subtle && typeof crypto.subtle.digest === 'function') {
+            try {
+                const encoder = new TextEncoder();
+                const dataBuffer = encoder.encode(text);
+                const hashBuffer = await crypto.subtle.digest('SHA-256', dataBuffer);
+                const hashArray = Array.from(new Uint8Array(hashBuffer));
+                const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+                // 返回前32位十六进制字符（128位哈希值）
+                return hashHex.substring(0, 32);
+            } catch (error) {
+                console.warn('Web Crypto API 不可用，尝试使用 crypto-js:', error);
+            }
+        }
+        
+        // 如果Web Crypto API不可用，则尝试使用crypto-js库
+        if (typeof CryptoJS !== 'undefined' && CryptoJS.SHA256) {
+            try {
+                const hashObj = CryptoJS.SHA256(text);
+                const hashHex = hashObj.toString(CryptoJS.enc.Hex);
+                // 返回前32位十六进制字符（128位哈希值）
+                return hashHex.substring(0, 32);
+            } catch (error) {
+                console.error('crypto-js 计算哈希失败:', error);
+            }
+        }
+        
+        // 如果两种方法都失败，抛出错误
+        throw new Error('无法计算哈希值：Web Crypto API 和 crypto-js 均不可用');
     }
 
     // 防抖函数
